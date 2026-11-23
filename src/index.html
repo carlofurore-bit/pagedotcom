@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PageDotCom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;600&family=Dancing+Script:wght@600&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Raleway:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ── TOP BAR ──────────────────────────────────────────────── -->
+<div id="topbar">
+  <div id="topbar-left">
+    <span id="app-logo">⬡ PageDotCom</span>
+    <button class="tb-btn" onclick="App.newProject()" title="New project">New</button>
+    <button class="tb-btn" onclick="App.openProject()" title="Open a previously saved PageDotCom file">Open</button>
+    <button class="tb-btn" onclick="App.importHTML()" title="Import any external HTML page and convert its content to editable elements">Import HTML</button>
+    <button class="tb-btn" id="undo-btn" onclick="History.undo()" title="Undo (Ctrl+Z)" disabled style="opacity:.45;">↩ Undo</button>
+    <button class="tb-btn" id="redo-btn" onclick="History.redo()" title="Redo (Ctrl+Y)" disabled style="opacity:.45;">↪ Redo</button>
+  </div>
+  <div id="topbar-center">
+    <span id="project-name-display" ondblclick="App.renameProject()">Untitled Project</span>
+  </div>
+  <div id="topbar-right">
+    <button class="tb-btn tb-btn-accent" onclick="App.previewPage()">▶ Preview</button>
+    <button class="tb-btn tb-btn-green" onclick="App.exportHTML()">⬇ Export / Save</button>
+  </div>
+</div>
+
+<!-- ── MAIN ─────────────────────────────────────────────────── -->
+<div id="main">
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+
+    <!-- AI GENERATE -->
+    <div class="panel-section" id="ai-gen-section">
+      <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between;">
+        ✦ AI Generate
+        <button class="prop-btn" onclick="AiGen.openSettings()" style="font-size:9px;padding:2px 7px;margin:0;">⚙ Setup</button>
+      </div>
+      <textarea id="ai-prompt-input" class="prop-textarea" placeholder="Describe what to add…&#10;e.g. &quot;hero section with title and CTA button&quot;&#10;or &quot;three feature cards with icons&quot;"></textarea>
+      <button class="add-btn" id="ai-gen-btn" onclick="AiGen.generate(document.getElementById('ai-prompt-input').value)">✦ Generate  <span style="font-size:9px;opacity:.6;">Ctrl+Enter</span></button>
+      <div id="ai-gen-status"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Pages</div>
+      <div id="pages-list"></div>
+      <button class="add-btn" onclick="App.addPage()">+ Add Page</button>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Elements</div>
+      <div id="tools-grid">
+        <div class="tool-btn" data-type="panel"     data-tip-title="Panel" data-tip="A styled card with a title and body text. Great for feature sections, bios, or any boxed content. Can have custom backgrounds, borders, shapes, and a zoom-on-hover effect.">
+          <span class="tool-icon">▭</span><span>Panel</span></div>
+        <div class="tool-btn" data-type="table"     data-tip-title="Table / Grid" data-tip="A responsive grid of cards — think feature comparison, pricing tiers, or skill rows. Set any number of columns and rows. Each cell has its own title and body.">
+          <span class="tool-icon">⊞</span><span>Table</span></div>
+        <div class="tool-btn" data-type="heading"   data-tip-title="Heading" data-tip="A large title text — H1 to H4. Use it for section titles or page headers. Supports all fonts, sizes, colors and letter spacing.">
+          <span class="tool-icon">H</span><span>Heading</span></div>
+        <div class="tool-btn" data-type="text"      data-tip-title="Text Block" data-tip="A paragraph of body text. Supports all fonts, sizes, colors and text alignment. Use multiple text blocks for multi-column layouts.">
+          <span class="tool-icon">¶</span><span>Text</span></div>
+        <div class="tool-btn" data-type="image"     data-tip-title="Image" data-tip="Embed a photo or graphic from your computer. Supports PNG, JPG, GIF, WebP and SVG. You can control how the image fills its container (cover, contain, etc.).">
+          <span class="tool-icon">🖼</span><span>Image</span></div>
+        <div class="tool-btn" data-type="divider"   data-tip-title="Divider Line" data-tip="A horizontal rule to separate sections. You can change its color, thickness, and line style (solid, dashed, dotted, double).">
+          <span class="tool-icon">—</span><span>Divider</span></div>
+        <div class="tool-btn" data-type="button"    data-tip-title="Button / Link" data-tip="A clickable button that takes visitors somewhere: a URL, another page in your project, or a named section on the current page.">
+          <span class="tool-icon">⬜</span><span>Button</span></div>
+        <div class="tool-btn" data-type="navbar"    data-tip-title="Navigation Bar" data-tip="A top navigation bar with your site name and links. Can be made sticky so it stays visible while scrolling.">
+          <span class="tool-icon">☰</span><span>Navbar</span></div>
+        <div class="tool-btn" data-type="contact"   data-tip-title="Contact Form" data-tip="A contact form with Name, Email, Subject and Message fields. When submitted it opens the visitor's email client pre-filled — no server needed.">
+          <span class="tool-icon">✉</span><span>Contact</span></div>
+        <div class="tool-btn" data-type="section"   data-tip-title="Section Anchor" data-tip="⚠ Invisible in the final page — it marks a named location. Buttons and navbar links can target it with #section-name so the page scrolls there when clicked.">
+          <span class="tool-icon">§</span><span>Section</span></div>
+        <div class="tool-btn" data-type="spacer"    data-tip-title="Spacer" data-tip="⚠ Invisible in the final page — it adds blank vertical space. Use it to push content down or to add breathing room between elements.">
+          <span class="tool-icon">↕</span><span>Spacer</span></div>
+        <div class="tool-btn" data-type="shape"     data-tip-title="Shape" data-tip="A decorative filled rectangle, circle, or other geometric form. Use it as a background accent, a colored block, or an abstract design element.">
+          <span class="tool-icon">◇</span><span>Shape</span></div>
+        <div class="tool-btn" data-type="codeblock" data-tip-title="Code Block" data-tip="Displays pre-formatted code or monospace text with a dark background. Useful for tech portfolios, documentation sections, or any literal text.">
+          <span class="tool-icon">&lt;/&gt;</span><span>Code</span></div>
+        <div class="tool-btn" data-type="folderpanel" data-tip-title="Folder Panels" data-tip="A scroll-driven stacking effect: multiple full-width panels with photo backgrounds that slide over each other as the visitor scrolls — like flipping through folder dividers. Each panel has its own image, title, and body text.">
+          <span class="tool-icon">🗂</span><span>Folders</span></div>
+        <div class="tool-btn" data-type="hscroll" data-tip-title="Horizontal Scroll Cards" data-tip="A horizontally scrollable strip of image+text cards. Great for portfolios, product showcases, or team members. Drag to scroll, or enable auto-scroll in settings.">
+          <span class="tool-icon">↔</span><span>H-Scroll</span></div>
+        <div class="tool-btn" data-type="collage" data-tip-title="Photo Collage" data-tip="A responsive grid photo collage. Add any number of images from URLs, control columns, gap and hover effects. Masonry-style or uniform grid.">
+          <span class="tool-icon">⊟</span><span>Collage</span></div>
+        <div class="tool-btn" data-type="line" data-tip-title="Line / Separator" data-tip="A decorative line element — horizontal or vertical. Supports solid, dashed, dotted styles, gradient fade, glow effects. Snap to element borders for precise layouts like flow diagrams and precedence graphs.">
+          <span class="tool-icon">╱</span><span>Line</span></div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Background Layers</div>
+      <div id="bg-layers-list"></div>
+      <button class="add-btn" id="bg-add-line-btn" onclick="BgLayers.addDivider()" style="margin-top:4px;display:none;">✂ Add Split Line</button>
+      <button class="add-btn" onclick="BgLayers.addLayer()" style="margin-top:4px;">+ Add Background Zone</button>
+      <div id="bg-layer-opts" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">🎨 Theme Presets</div>
+      <p style="font-size:9px;color:var(--muted);margin:0 0 6px;">Applies palette + fonts to ALL elements on this page.</p>
+      <div id="theme-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;"></div>
+      <script>
+        (function(){
+          const grid=document.getElementById('theme-grid');
+          if(!grid||typeof THEMES==='undefined')return;
+          grid.innerHTML=THEMES.map(t=>
+            `<button onclick="applyTheme('${t.id}')" title="${t.label}" style="padding:5px 6px;font-size:10px;border-radius:5px;border:1px solid rgba(255,255,255,0.1);background:${t.pageBg};color:${t.heading||'#fff'};cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${t.label}</button>`
+          ).join('');
+        })();
+      </script>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Page Cursor</div>
+      <div id="cursor-picker">
+        <label class="bg-row"><input type="radio" name="cursor-type" value="default"   checked onchange="App.setCursorType('default')"/> Default arrow</label>
+        <label class="bg-row"><input type="radio" name="cursor-type" value="dot"       onchange="App.setCursorType('dot')"/> Glowing dot</label>
+        <label class="bg-row"><input type="radio" name="cursor-type" value="ring"      onchange="App.setCursorType('ring')"/> Ring tracker</label>
+        <label class="bg-row"><input type="radio" name="cursor-type" value="crosshair" onchange="App.setCursorType('crosshair')"/> Crosshair</label>
+        <label class="bg-row"><input type="radio" name="cursor-type" value="none"      onchange="App.setCursorType('none')"/> Hidden</label>
+        <div id="cursor-color-row" class="hidden" style="padding-top:4px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;color:var(--muted);">Cursor color</span>
+          <input type="color" id="cursor-color" value="#00ff41" oninput="App.setCursorColor(this.value)"/>
+        </div>
+      </div>
+    </div>
+
+    <div id="snap-section" class="panel-section">
+      <div class="panel-title">Snap</div>
+      <label class="bg-row"><input type="checkbox" id="snap-enabled" checked onchange="Snap.enabled=this.checked"/> Element snapping</label>
+      <label class="bg-row" style="margin-top:5px;"><input type="checkbox" id="snap-grid-enabled" onchange="Snap.gridEnabled=this.checked"/> Grid snap (20 px)</label>
+    </div>
+
+  </div><!-- /left-panel -->
+
+  <!-- CENTER CANVAS -->
+  <div id="canvas-wrap">
+    <div id="editor-canvas" onclick="Canvas.handleClick(event)">
+      <div id="bg-layers-canvas" style="position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;"></div>
+      <svg id="bg-dividers-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible;"></svg>
+      <div id="elements-layer" style="position:relative;z-index:3;"></div>
+      <svg id="bg-divider-handles" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;overflow:visible;"></svg>
+      <div id="snap-guide-h" class="snap-guide snap-guide-h hidden"></div>
+      <div id="snap-guide-v" class="snap-guide snap-guide-v hidden"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PROPERTIES -->
+  <div id="right-panel">
+    <div class="panel-title">Properties</div>
+    <div id="props-none">
+      <p class="props-hint">Pick a tool on the left, then click the canvas to place an element.<br/><br/>Click any placed element to select it and edit its properties here.</p>
+      <p class="props-hint" style="margin-top:10px;background:rgba(109,63,207,.10);border-left:3px solid #6d3fcf;padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.6;">💡 <strong>Tip:</strong> While an element is selected you can resize and edit it — but dragging other elements is disabled. <strong>Click on empty canvas space to deselect</strong>, then drag freely.</p>
+    </div>
+    <div id="props-panel" class="hidden"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── TOOLTIP ─────────────────────────────────────────────── -->
+<div id="tool-tooltip"></div>
+
+<!-- ── WARN MODAL ──────────────────────────────────────────── -->
+<div id="warn-overlay" class="hidden">
+  <div id="warn-box">
+    <div id="warn-icon">⚠️</div>
+    <div id="warn-title">Unsaved changes</div>
+    <div id="warn-msg"></div>
+    <label id="warn-check-row"><input type="checkbox" id="warn-dont-ask"/> Don't show this warning again</label>
+    <div id="warn-btns">
+      <button id="warn-cancel" onclick="WarnModal.cancel()">Cancel</button>
+      <button id="warn-ok" onclick="WarnModal.confirm()">Continue anyway</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PREVIEW MODAL ────────────────────────────────────────── -->
+<div id="preview-modal" class="modal hidden">
+  <div id="preview-header">
+    <span>▶ Preview — <span id="preview-page-name"></span></span>
+    <button onclick="App.closePreview()">✕ Close</button>
+  </div>
+  <iframe id="preview-frame"></iframe>
+</div>
+
+<!-- ── CONTEXT MENU ─────────────────────────────────────────── -->
+<div id="ctx-menu" class="hidden">
+  <div class="ctx-item" onclick="Clipboard.copy();CtxMenu.hide()">Copy</div>
+  <div class="ctx-item" onclick="Clipboard.paste();CtxMenu.hide()">Paste</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="CtxMenu.duplicate()">Duplicate</div>
+  <div class="ctx-item" onclick="CtxMenu.moveUp()">Move Up</div>
+  <div class="ctx-item" onclick="CtxMenu.moveDown()">Move Down</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item ctx-delete" onclick="CtxMenu.delete()">Delete</div>
+</div>
+
+<!-- ── AI GHOST BAR ─────────────────────────────────────────── -->
+<div id="ghost-bar" class="hidden">
+  <span style="color:#63b3ed;font-weight:600;">✦ <span id="ghost-count">0</span> AI suggestion<span id="ghost-plural">s</span></span>
+  <div class="ghost-sep"></div>
+  <button class="tb-btn" onclick="AiGen.acceptAll()" style="background:rgba(46,160,67,.18);border-color:#2ea043;color:#3fb950;padding:5px 14px;">✓ Accept All<kbd>Enter</kbd></button>
+  <button class="tb-btn" onclick="AiGen.rejectAll()" style="background:rgba(218,54,51,.12);border-color:rgba(218,54,51,.5);color:#f85149;padding:5px 14px;">✗ Discard<kbd>Esc</kbd></button>
+  <div class="ghost-sep"></div>
+  <span style="font-size:10px;color:#64748b;">click any ghost to accept one</span>
+</div>
+
+<!-- ── AI SETTINGS MODAL ─────────────────────────────────────── -->
+<div id="ai-settings-overlay" class="hidden">
+  <div id="ai-settings-box">
+    <h3>✦ AI Generate — Setup</h3>
+    <div id="ai-ollama-status" style="font-size:11px;margin-bottom:10px;padding:6px 10px;border-radius:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);"></div>
+    <div class="prop-group">
+      <label class="prop-label">Ollama Model <span style="font-weight:400;color:var(--muted);">(local, free)</span></label>
+      <input id="ai-settings-model" class="prop-input" type="text" placeholder="qwen2.5-coder:7b"/>
+      <div id="ai-model-list" style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5;"></div>
+      <p class="props-hint" style="margin-top:5px;">Best model for HTML: <strong>qwen2.5-coder:7b</strong><br/>Pull it once: <code>ollama pull qwen2.5-coder:7b</code><br/>Or use <strong>llama3.1</strong> / <strong>mistral</strong> if already installed.</p>
+    </div>
+    <div class="prop-group" style="margin-top:10px;">
+      <label class="prop-label">OpenAI API Key <span style="font-weight:400;color:var(--muted);">(fallback if Ollama not running)</span></label>
+      <input id="ai-settings-key" class="prop-input" type="password" placeholder="sk-… (optional)"/>
+      <p class="props-hint" style="margin-top:3px;">Paste your own key. Costs ~€0.01–0.05 per generation. Never sent anywhere except OpenAI.</p>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="prop-btn" onclick="AiGen.saveSettingsFromModal()" style="flex:1;background:rgba(31,111,235,.2);border-color:#1f6feb;color:#58a6ff;font-weight:600;">✓ Save</button>
+      <button class="prop-btn" onclick="document.getElementById('ai-settings-overlay').classList.add('hidden')" style="flex:1;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PREVISION SUGGESTION BAR ─────────────────────────────── -->
+<div id="prevision-bar" class="hidden" style="position:fixed;bottom:0;left:0;right:0;z-index:9000;display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(5,5,16,0.95);border-top:1px solid rgba(163,113,247,.25);backdrop-filter:blur(8px);flex-wrap:wrap;"></div>
+
+<!-- ── TEMPLATE PICKER ───────────────────────────────────────── -->
+<div id="tmpl-overlay" style="position:fixed;inset:0;background:rgba(5,5,16,0.97);z-index:20000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:32px 0;">
+  <div style="max-width:900px;width:100%;padding:0 24px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-size:28px;font-weight:800;color:#e6edf3;letter-spacing:-.5px;">⬡ PageDotCom</div>
+      <div style="font-size:14px;color:#8b949e;margin-top:6px;">Choose a template to get started, or begin with a blank canvas</div>
+    </div>
+    <div id="tmpl-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+
+      <!-- Blank -->
+      <div onclick="Templates.startBlank()" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#1f6feb';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:40px;">+</div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">Blank Project</div>
+          <div style="font-size:11px;color:#8b949e;">Start from scratch with an empty canvas</div>
+        </div>
+      </div>
+
+      <!-- Portfolio -->
+      <div onclick="Templates.load('portfolio')" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#1f6feb';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;background:linear-gradient(135deg,#0d1117 0%,#1a1a2e 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="https://i.pravatar.cc/200?img=12" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(31,111,235,.5);object-fit:cover;"/>
+          <div style="margin-left:16px;"><div style="color:#e6edf3;font-weight:700;font-size:15px;">Alex Morgan</div><div style="color:#1f6feb;font-size:11px;margin-top:2px;">Designer &amp; Developer</div></div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">👤 Portfolio Site <span style="font-weight:400;color:#1f6feb;font-size:10px;">4 pages</span></div>
+          <div style="font-size:11px;color:#8b949e;">Home · Work · About · Contact — all pages linked via navbar</div>
+        </div>
+      </div>
+
+      <!-- Business -->
+      <div onclick="Templates.load('business')" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#f78166';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;background:linear-gradient(135deg,#0a0a14,#1a0a2a);display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:12px;">
+          <img src="https://i.pravatar.cc/200?img=32" style="width:56px;height:56px;border-radius:50%;object-fit:cover;"/>
+          <img src="https://i.pravatar.cc/200?img=44" style="width:56px;height:56px;border-radius:50%;object-fit:cover;"/>
+          <img src="https://i.pravatar.cc/200?img=61" style="width:56px;height:56px;border-radius:50%;object-fit:cover;"/>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">🏢 Business Site <span style="font-weight:400;color:#f78166;font-size:10px;">4 pages</span></div>
+          <div style="font-size:11px;color:#8b949e;">Home · Services · Team · Contact — with pricing, testimonials, team</div>
+        </div>
+      </div>
+
+      <!-- Photography -->
+      <div onclick="Templates.load('photography')" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#ffffff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;overflow:hidden;">
+          <img src="https://picsum.photos/seed/mountain/200/140" style="width:100%;height:140px;object-fit:cover;"/>
+          <img src="https://picsum.photos/seed/forest/200/140" style="width:100%;height:140px;object-fit:cover;"/>
+          <img src="https://picsum.photos/seed/city/200/140" style="width:100%;height:140px;object-fit:cover;"/>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">📷 Photography Portfolio <span style="font-weight:400;color:#aaa;font-size:10px;">3 pages</span></div>
+          <div style="font-size:11px;color:#8b949e;">Gallery · About · Book a Session — all cross-linked</div>
+        </div>
+      </div>
+
+      <!-- Announcement -->
+      <div onclick="Templates.load('announcement')" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#f0a500';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;background:linear-gradient(135deg,#0d0221,#1a0a0a);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+          <div style="font-size:28px;font-weight:900;color:#f0a500;letter-spacing:-1px;">IMPORTANT</div>
+          <div style="font-size:11px;color:rgba(240,165,0,.7);text-transform:uppercase;letter-spacing:2px;">Official Notice</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">📢 Announcement Page <span style="font-weight:400;color:#f0a500;font-size:10px;">1 page</span></div>
+          <div style="font-size:11px;color:#8b949e;">Legal notice, press release or official announcement — single focused page</div>
+        </div>
+      </div>
+
+      <!-- Presentation -->
+      <div onclick="Templates.load('presentation')" style="cursor:pointer;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#a371f7';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform=''">
+        <div style="height:140px;background:linear-gradient(135deg,#050510,#1a0a3a);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;">
+          <div style="font-size:22px;font-weight:800;color:#a371f7;">The Big Idea</div>
+          <div style="display:flex;gap:4px;"><div style="width:8px;height:8px;border-radius:50%;background:#a371f7;"></div><div style="width:8px;height:8px;border-radius:50%;background:rgba(163,113,247,.3);"></div><div style="width:8px;height:8px;border-radius:50%;background:rgba(163,113,247,.3);"></div></div>
+          <div style="font-size:11px;color:rgba(163,113,247,.6);">scroll-driven slides</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#e6edf3;font-size:13px;margin-bottom:4px;">🎬 Pitch Deck <span style="font-weight:400;color:#a371f7;font-size:10px;">3 pages</span></div>
+          <div style="font-size:11px;color:#8b949e;">Presentation · Q&A · Contact — scroll-driven slides + linked navigation</div>
+        </div>
+      </div>
+
+      <!-- Elements Showcase -->
+      <div onclick="Templates.load('showcase')" style="cursor:pointer;border:2px solid rgba(63,185,80,.3);border-radius:10px;overflow:hidden;background:rgba(63,185,80,.04);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='#3fb950';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(63,185,80,.3)';this.style.transform=''">
+        <div style="height:140px;background:linear-gradient(135deg,#010d06,#0a1a10);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:16px;position:relative;">
+          <div style="position:absolute;top:8px;right:10px;font-size:9px;color:#3fb950;font-weight:700;text-transform:uppercase;letter-spacing:1px;">6 PAGES</div>
+          <span style="font-size:20px;">▭</span><span style="font-size:20px;">⊞</span><span style="font-size:20px;">H</span><span style="font-size:20px;">🖼</span><span style="font-size:20px;">—</span><span style="font-size:20px;">⬜</span>
+          <span style="font-size:20px;">🗂</span><span style="font-size:20px;">↔</span><span style="font-size:20px;">⬡</span><span style="font-size:20px;">✦</span><span style="font-size:20px;">📋</span><span style="font-size:20px;">╱</span>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-weight:700;color:#3fb950;font-size:13px;margin-bottom:4px;">🧩 Elements Showcase <span style="font-weight:400;color:#3fb950;font-size:10px;">6 fully-linked pages</span></div>
+          <div style="font-size:11px;color:#8b949e;">Typography · Panels · Media · Shapes · Animations · Buttons — every feature demonstrated</div>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;font-size:11px;color:#484f58;">All templates are fully editable after loading · Your data stays local · No account required</div>
+  </div>
+</div>
+
+<script src="bg-effects.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>
